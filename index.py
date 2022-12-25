@@ -7,7 +7,7 @@ db = firestore.client()
 import requests
 from bs4 import BeautifulSoup
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request,make_response, jsonify
 from datetime import datetime, timezone, timedelta
 app = Flask(__name__)
 
@@ -89,6 +89,35 @@ def search():
         return info
     else:  
         return render_template("input.html")
+@app.route("/webhook", methods=["POST"])
+def webhook():
+    # build a request object
+    req = request.get_json(force=True)
+    # fetch queryResult from json
+    action =  req.get("queryResult").get("action")
+    msg =  req.get("queryResult").get("queryText")
+    info = "動作：" + action + "； 查詢內容：" + msg
+    return make_response(jsonify({"fulfillmentText": info}))
+
+    if __name__ == "__main__":
+    app.run()
+
+
+	elif (action == "CityWeather"):
+        city =  req.get("queryResult").get("parameters").get("city")
+        token = "rdec-key-123-45678-011121314"
+        url = "https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-C0032-001?Authorization=" + token + "&format=JSON&locationName=" + str(city)
+        Data = requests.get(url)
+        Weather = json.loads(Data.text)["records"]["location"][0]["weatherElement"][0]["time"][0]["parameter"]["parameterName"]
+        Rain = json.loads(Data.text)["records"]["location"][0]["weatherElement"][1]["time"][0]["parameter"]["parameterName"]
+        MinT = json.loads(Data.text)["records"]["location"][0]["weatherElement"][2]["time"][0]["parameter"]["parameterName"]
+        MaxT = json.loads(Data.text)["records"]["location"][0]["weatherElement"][4]["time"][0]["parameter"]["parameterName"]
+        info = city + "的天氣是" + Weather + "，降雨機率：" + Rain + "%"
+        info += "，溫度：" + MinT + "-" + MaxT + "度"
+
+return make_response(jsonify({"fulfillmentText": info}))
+
+
 
 if __name__ == "__main__":
     app.run()
