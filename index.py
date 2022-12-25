@@ -7,7 +7,7 @@ db = firestore.client()
 import requests
 from bs4 import BeautifulSoup
 
-from flask import Flask, render_template, request,make_response, jsonify
+from flask import Flask, render_template, request
 from datetime import datetime, timezone, timedelta
 app = Flask(__name__)
 
@@ -89,3 +89,6 @@ def search():
         return info
     else:  
         return render_template("input.html")
+
+if __name__ == "__main__":
+    app.run()
